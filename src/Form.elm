@@ -1,0 +1,271 @@
+module Form
+    exposing
+        ( FieldMsg(..)
+        , Form
+        , Field(..)
+        , FieldOf
+        , FormConfig
+        , createForm
+        , fieldString
+        , fieldBool
+        , fieldListString
+        , updateForm
+        , isFormValid
+        )
+
+{-| Simple, clean and extendable form manager for Elm
+
+
+# Types
+
+@docs FieldMsg , Form , Field, FieldOf , FormConfig
+
+
+# Create form and fields
+
+@docs createForm, fieldString, fieldBool, fieldListString
+
+
+# Update form and fields state
+
+@docs updateForm
+
+
+# Check if form is valid
+
+@docs isFormValid
+
+-}
+
+import Dict exposing (Dict)
+import Form.Validators exposing (Validator)
+
+
+-- Types
+
+
+{-| Field message to update a field
+-}
+type FieldMsg
+    = AsString String String
+    | AsBool String
+    | AsListString String (List String)
+
+
+{-| Form type
+-}
+type alias Form =
+    { fields : Dict String Field
+    , error : Maybe String
+    , submitting : Bool
+    }
+
+
+{-| Field type
+-}
+type Field
+    = IsString (FieldOf (Maybe String))
+    | IsBool (FieldOf Bool)
+    | IsListString (FieldOf (List String))
+
+
+{-| Internal type of a Field
+-}
+type alias FieldOf a =
+    { value : a
+    , validationResult : Result String a
+    , validators : List (Validator a)
+    }
+
+
+{-| Type used for configuring the form
+-}
+type alias FormConfig =
+    Form -> Form
+
+
+
+-- Form and Fields
+
+
+{-| Creates a form
+-}
+createForm : List FormConfig -> Form
+createForm configs =
+    let
+        initialForm =
+            { fields = Dict.empty
+            , error = Nothing
+            , submitting = False
+            }
+    in
+        applyConfig configs initialForm
+
+
+{-| Private: applies config to the form
+-}
+applyConfig : List FormConfig -> Form -> Form
+applyConfig configs form =
+    case configs of
+        config :: rest ->
+            applyConfig rest (config form)
+
+        empty ->
+            form
+
+
+{-| Creates a field string
+-}
+fieldString : String -> Maybe String -> List (Validator (Maybe String)) -> FormConfig
+fieldString name value validators form =
+    let
+        field =
+            IsString { value = value, validationResult = Err "", validators = validators }
+    in
+        { form | fields = Dict.insert name field form.fields }
+
+
+{-| Creates a field bool
+-}
+fieldBool : String -> Bool -> List (Validator Bool) -> FormConfig
+fieldBool name value validators form =
+    let
+        field =
+            IsBool { value = value, validationResult = Err "", validators = validators }
+    in
+        { form | fields = Dict.insert name field form.fields }
+
+
+{-| Creates a field of list string
+-}
+fieldListString : String -> List String -> List (Validator (List String)) -> FormConfig
+fieldListString name value validators form =
+    let
+        field =
+            IsListString { value = value, validationResult = Err "", validators = validators }
+    in
+        { form | fields = Dict.insert name field form.fields }
+
+
+{-| Update the state of a form and runs validation
+-}
+updateForm : Form -> FieldMsg -> Form
+updateForm form fieldMsg =
+    let
+        update =
+            updateOnFieldMsg fieldMsg
+    in
+        case fieldMsg of
+            AsString name _ ->
+                { form | fields = Dict.update name update form.fields }
+
+            AsBool name ->
+                { form | fields = Dict.update name update form.fields }
+
+            AsListString name _ ->
+                { form | fields = Dict.update name update form.fields }
+
+
+{-| Private: Update a field based on a FieldMsg
+-}
+updateOnFieldMsg : FieldMsg -> Maybe Field -> Maybe Field
+updateOnFieldMsg fieldMsg field =
+    case ( field, fieldMsg ) of
+        ( Just (IsString field), AsString _ value ) ->
+            Just (IsString (updateField (Just value) field))
+
+        ( Just (IsBool field), AsBool _ ) ->
+            Just (IsBool (updateField (not field.value) field))
+
+        ( Just (IsListString field), AsListString _ value ) ->
+            Just (IsListString (updateField value field))
+
+        _ ->
+            Nothing
+
+
+{-| Private: Update a field
+-}
+updateField : a -> FieldOf a -> FieldOf a
+updateField value field =
+    { field
+        | value = value
+        , validationResult = runAllValidators field.validators value
+    }
+
+
+{-| Private: Runs all validations on a value
+-}
+runAllValidators : List (Validator a) -> a -> Result String a
+runAllValidators validators value =
+    case validators of
+        validator :: rest ->
+            case validator value of
+                Ok _ ->
+                    runAllValidators rest value
+
+                Err msg ->
+                    Err msg
+
+        empty ->
+            Ok value
+
+
+{-| Checks if a form is true
+-}
+isFormValid : Form -> Bool
+isFormValid form =
+    form
+        |> validate
+        |> .fields
+        |> Dict.values
+        |> List.all isFieldValid
+
+
+{-| Private: Force the form to run all validations
+-}
+validate : Form -> Form
+validate form =
+    { form | fields = Dict.map (\key -> validateField) form.fields }
+
+
+{-| Private: Validate a field
+-}
+validateField : Field -> Field
+validateField field =
+    case field of
+        IsString field ->
+            IsString (updateField field.value field)
+
+        IsBool field ->
+            IsBool (updateField field.value field)
+
+        IsListString field ->
+            IsListString (updateField field.value field)
+
+
+{-| Private: Check if a field is valid
+-}
+isFieldValid : Field -> Bool
+isFieldValid field =
+    case field of
+        IsString field ->
+            isResultOk field.validationResult
+
+        IsBool field ->
+            isResultOk field.validationResult
+
+        IsListString field ->
+            isResultOk field.validationResult
+
+
+{-| Private: Return true if a Result is Ok else false
+-}
+isResultOk : Result a b -> Bool
+isResultOk result =
+    case result of
+        Ok _ ->
+            True
+
+        Err _ ->
+            False
