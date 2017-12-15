@@ -64,7 +64,7 @@ type alias Form =
 {-| Field type
 -}
 type Field
-    = IsString (FieldOf (Maybe String))
+    = IsString (FieldOf String)
     | IsBool (FieldOf Bool)
     | IsListString (FieldOf (List String))
 
@@ -116,7 +116,7 @@ applyConfig configs form =
 
 {-| Creates a field string
 -}
-fieldString : String -> Maybe String -> List (Validator (Maybe String)) -> FormConfig
+fieldString : String -> String -> List (Validator String) -> FormConfig
 fieldString name value validators form =
     let
         field =
@@ -172,7 +172,7 @@ updateOnFieldMsg : FieldMsg -> Maybe Field -> Maybe Field
 updateOnFieldMsg fieldMsg field =
     case ( field, fieldMsg ) of
         ( Just (IsString field), AsString _ value ) ->
-            Just (IsString (updateField (Just value) field))
+            Just (IsString (updateField value field))
 
         ( Just (IsBool field), AsBool _ ) ->
             Just (IsBool (updateField (not field.value) field))
@@ -190,19 +190,19 @@ updateField : a -> FieldOf a -> FieldOf a
 updateField value field =
     { field
         | value = value
-        , validationResult = runAllValidators field.validators value
+        , validationResult = validateValue field.validators value
     }
 
 
 {-| Private: Runs all validations on a value
 -}
-runAllValidators : List (Validator a) -> a -> Result String a
-runAllValidators validators value =
+validateValue : List (Validator a) -> a -> Result String a
+validateValue validators value =
     case validators of
         validator :: rest ->
             case validator value of
                 Ok _ ->
-                    runAllValidators rest value
+                    validateValue rest value
 
                 Err msg ->
                     Err msg

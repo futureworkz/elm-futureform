@@ -32,8 +32,8 @@ initialModel : ( Model, Cmd Msg )
 initialModel =
     ( { form =
             createForm
-                [ fieldString "email" Nothing [ validateEmail ]
-                , fieldString "password" Nothing [ validatePassword ]
+                [ fieldString "email" "" [ validateEmail ]
+                , fieldString "password" "" [ validatePassword ]
                 , fieldBool "remember" False []
                 ]
       }

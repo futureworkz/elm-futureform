@@ -29,10 +29,10 @@ suite =
                 \key ->
                     let
                         form =
-                            createForm [ fieldString key Nothing [] ]
+                            createForm [ fieldString key "" [] ]
                     in
                         Dict.get key form.fields
-                            |> equal (Just (IsString (FieldOf Nothing (Err "") [])))
+                            |> equal (Just (IsString (FieldOf "" (Err "") [])))
             ]
         , describe "fieldBool"
             [ fuzz string "defines a Bool field in a form" <|
@@ -61,11 +61,11 @@ suite =
                         key =
                             "email"
                     in
-                        createForm [ fieldString key Nothing [] ]
+                        createForm [ fieldString key "" [] ]
                             |> (flip updateForm) (AsString key newValue)
                             |> .fields
                             |> Dict.get key
-                            |> equal (Just (IsString (FieldOf (Just newValue) (Ok (Just newValue)) [])))
+                            |> equal (Just (IsString (FieldOf newValue (Ok newValue) [])))
             , test "update a bool field from FieldMsg AsBool" <|
                 \_ ->
                     let
@@ -93,14 +93,14 @@ suite =
             [ describe "Invalid form"
                 [ fuzz string "Returns False" <|
                     \key ->
-                        createForm [ fieldString key Nothing [ isNotEmpty ] ]
+                        createForm [ fieldString key "" [ isNotEmpty ] ]
                             |> isFormValid
                             |> equal False
                 ]
             , describe "Valid form"
                 [ fuzz2 string string "Returns True" <|
                     \key newValue ->
-                        createForm [ fieldString key (Just (newValue ++ "never empty")) [ isNotEmpty ] ]
+                        createForm [ fieldString key (newValue ++ "never empty") [ isNotEmpty ] ]
                             |> isFormValid
                             |> equal True
                 ]

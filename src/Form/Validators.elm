@@ -25,44 +25,29 @@ type alias Validator a =
 
 {-| Checks that a string is not empty
 -}
-isNotEmpty : Validator (Maybe String)
+isNotEmpty : Validator String
 isNotEmpty string =
-    case string of
-        Just string ->
-            if String.length string > 0 then
-                Ok (Just string)
-            else
-                Err "This field cannot be empty"
-
-        Nothing ->
-            Err "This field cannot be empty"
+    if String.length string > 0 then
+        Ok string
+    else
+        Err "This field cannot be empty"
 
 
 {-| Checks that a string is a valid email
 -}
-validateEmail : Validator (Maybe String)
+validateEmail : Validator String
 validateEmail email =
-    case email of
-        Just email ->
-            if Regex.contains (Regex.regex "\\S+@\\S+\\.\\S+") email then
-                Ok (Just email)
-            else
-                Err "Please enter a valid email."
-
-        Nothing ->
-            Err ""
+    if Regex.contains (Regex.regex "\\S+@\\S+\\.\\S+") email then
+        Ok email
+    else
+        Err "Please enter a valid email."
 
 
 {-| Checks that a string is a valid password
 -}
-validatePassword : Validator (Maybe String)
+validatePassword : Validator String
 validatePassword password =
-    case password of
-        Just password ->
-            if String.length password >= 6 then
-                Ok (Just password)
-            else
-                Err "Password must be at least 6 characters long."
-
-        Nothing ->
-            Err ""
+    if String.length password >= 6 then
+        Ok password
+    else
+        Err "Password must be at least 6 characters long."
