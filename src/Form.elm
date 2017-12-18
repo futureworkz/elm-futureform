@@ -11,6 +11,7 @@ module Form
         , fieldListString
         , updateForm
         , isFormValid
+        , getRawString
         )
 
 {-| Simple, clean and extendable form manager for Elm
@@ -269,3 +270,22 @@ isResultOk result =
 
         Err _ ->
             False
+
+
+{-| Get value of a string field
+-}
+getRawString : Dict String Field -> String -> String
+getRawString fields name =
+    case Dict.get name fields of
+        Just (IsString field) ->
+            field.value
+
+        _ ->
+            let
+                message =
+                    name ++ "' is not found"
+
+                _ =
+                    Debug.log "Futureform - getRawString" message
+            in
+                ""

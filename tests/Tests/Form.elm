@@ -105,4 +105,33 @@ suite =
                             |> equal True
                 ]
             ]
+        , describe "getRawString"
+            [ describe "Valid field name"
+                [ fuzz string "Returns value of string field" <|
+                    \value ->
+                        let
+                            fieldName =
+                                "name"
+                        in
+                            createForm [ fieldString fieldName value [] ]
+                                |> .fields
+                                |> (flip getRawString) fieldName
+                                |> equal value
+                ]
+            , describe "Invalid field name"
+                [ fuzz string "Returns empty value of string field" <|
+                    \value ->
+                        let
+                            fieldName =
+                                "name"
+
+                            invalidFieldName =
+                                "missingName"
+                        in
+                            createForm [ fieldString fieldName value [] ]
+                                |> .fields
+                                |> (flip getRawString) fieldName
+                                |> equal ""
+                ]
+            ]
         ]
