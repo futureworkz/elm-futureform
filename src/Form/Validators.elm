@@ -51,3 +51,19 @@ validatePassword password =
         Ok password
     else
         Err "Password must be at least 6 characters long."
+
+
+{-| Checks that a string does not have space and weird character
+-}
+validateUsername : Validator String
+validateUsername username =
+    let
+        regex =
+            \char -> Regex.contains (Regex.regex "[a-zA-Z0-9]") (toString char)
+    in
+        if String.length username < 3 then
+            Err "Username must be at least 3 characters long."
+        else if String.all regex username then
+            Ok username
+        else
+            Err "Please enter a valid username."
