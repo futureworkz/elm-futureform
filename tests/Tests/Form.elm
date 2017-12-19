@@ -130,7 +130,7 @@ suite =
                         in
                             createForm [ fieldString fieldName value [] ]
                                 |> .fields
-                                |> (flip getRawString) fieldName
+                                |> (flip getRawString) invalidFieldName
                                 |> equal ""
                 ]
             ]

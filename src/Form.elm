@@ -281,11 +281,4 @@ getRawString fields name =
             field.value
 
         _ ->
-            let
-                message =
-                    name ++ "' is not found"
-
-                _ =
-                    Debug.log "Futureform - getRawString" message
-            in
-                ""
+            Debug.log "FutureForm - getRawString" (name ++ " is not found") |> always ("")
