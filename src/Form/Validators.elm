@@ -47,23 +47,36 @@ validateEmail email =
 -}
 validatePassword : Validator String
 validatePassword password =
-    if String.length password >= 6 then
-        Ok password
-    else
-        Err "Password must be at least 6 characters long."
+    validateMinChars 6 password
 
 
-{-| Checks that a string does not have space and weird character
+{-| Check if string length is larger than an input number parameter
 -}
-validateUsername : Validator String
-validateUsername username =
+validateMinChars : Int -> Validator String
+validateMinChars minimumLength value =
+    if String.length value < minimumLength then
+        Err ("Field must be at least " ++ (toString minimumLength) ++ " characters long.")
+    else
+        Ok value
+
+
+{-| Check if string is only contain Alphabet and Numeric
+-}
+validateIsAlphaNumeric : Validator String
+validateIsAlphaNumeric value =
     let
         regex =
             \char -> Regex.contains (Regex.regex "[a-zA-Z0-9]") (toString char)
     in
-        if String.length username < 3 then
-            Err "Username must be at least 3 characters long."
-        else if String.all regex username then
-            Ok username
+        if String.all regex value then
+            Ok value
         else
-            Err "Please enter a valid username."
+            Err ("Field can only contains letters and numbers.")
+
+
+{-| Checks that a string only contain Alphabet and Numeric and string length larger than 2
+-}
+validateUsername : Validator String
+validateUsername username =
+    validateMinChars 3 username
+        |> Result.andThen validateIsAlphaNumeric
