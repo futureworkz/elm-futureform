@@ -36,6 +36,9 @@ getErrorMessage form fieldName =
                     IsListString field ->
                         getFieldErrorMessage field
 
+                    IsDate field ->
+                        getFieldErrorMessage field
+
 
 getFieldErrorMessage : FieldOf a -> Maybe String
 getFieldErrorMessage field =

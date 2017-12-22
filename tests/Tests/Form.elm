@@ -6,6 +6,8 @@ import Fuzz exposing (..)
 import Dict exposing (Dict)
 import Form exposing (..)
 import Form.Validators exposing (..)
+import Form.Functions exposing (..)
+import Date
 
 
 suite : Test
@@ -54,6 +56,22 @@ suite =
                         Dict.get key form.fields
                             |> equal (Just (IsListString (FieldOf values (Err "") [])))
             ]
+        , describe "fieldDate"
+            [ fuzz string "defines a date field in a form" <|
+                \key ->
+                    let
+                        dateInput =
+                            "20-01-2017"
+
+                        dateValue =
+                            dateFromStringWithDefault dateInput
+
+                        form =
+                            createForm [ fieldDate key dateInput [] ]
+                    in
+                        Dict.get key form.fields
+                            |> equal (Just (IsDate (FieldOf dateValue (Err "") [])))
+            ]
         , describe "updateForm"
             [ fuzz string "update a string field from FieldMsg AsString" <|
                 \newValue ->
@@ -88,6 +106,26 @@ suite =
                             |> .fields
                             |> Dict.get key
                             |> equal (Just (IsListString (FieldOf newValues (Ok newValues) [])))
+            , test "update a date field from FieldMsg AsDate" <|
+                \newValue ->
+                    let
+                        key =
+                            "birthday"
+
+                        dateInput =
+                            "20-01-2017"
+
+                        newDateInput =
+                            "25-01-2017"
+
+                        newDateValue =
+                            dateFromStringWithDefault newDateInput
+                    in
+                        createForm [ fieldDate key dateInput [] ]
+                            |> (flip updateForm) (AsDate key newDateInput)
+                            |> .fields
+                            |> Dict.get key
+                            |> equal (Just (IsDate (FieldOf newDateValue (Ok newDateValue) [])))
             ]
         , describe "isFormValid"
             [ describe "Invalid form"

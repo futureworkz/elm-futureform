@@ -9,6 +9,7 @@ module Form
         , fieldString
         , fieldBool
         , fieldListString
+        , fieldDate
         , updateForm
         , isFormValid
         , getRawString
@@ -39,7 +40,9 @@ module Form
 -}
 
 import Dict exposing (Dict)
+import Date
 import Form.Validators exposing (Validator)
+import Form.Functions exposing (dateFromStringWithDefault)
 
 
 -- Types
@@ -51,6 +54,7 @@ type FieldMsg
     = AsString String String
     | AsBool String
     | AsListString String (List String)
+    | AsDate String String
 
 
 {-| Form type
@@ -68,6 +72,7 @@ type Field
     = IsString (FieldOf String)
     | IsBool (FieldOf Bool)
     | IsListString (FieldOf (List String))
+    | IsDate (FieldOf Date.Date)
 
 
 {-| Internal type of a Field
@@ -148,6 +153,17 @@ fieldListString name value validators form =
         { form | fields = Dict.insert name field form.fields }
 
 
+{-| Creates a field of date
+-}
+fieldDate : String -> String -> List (Validator Date.Date) -> FormConfig
+fieldDate name value validators form =
+    let
+        field =
+            IsDate { value = (dateFromStringWithDefault value), validationResult = Err "", validators = validators }
+    in
+        { form | fields = Dict.insert name field form.fields }
+
+
 {-| Update the state of a form and runs validation
 -}
 updateForm : Form -> FieldMsg -> Form
@@ -166,6 +182,9 @@ updateForm form fieldMsg =
             AsListString name _ ->
                 { form | fields = Dict.update name update form.fields }
 
+            AsDate name _ ->
+                { form | fields = Dict.update name update form.fields }
+
 
 {-| Private: Update a field based on a FieldMsg
 -}
@@ -180,6 +199,9 @@ updateOnFieldMsg fieldMsg field =
 
         ( Just (IsListString field), AsListString _ value ) ->
             Just (IsListString (updateField value field))
+
+        ( Just (IsDate field), AsDate _ value ) ->
+            Just (IsDate (updateField (dateFromStringWithDefault value) field))
 
         _ ->
             Nothing
@@ -244,6 +266,9 @@ validateField field =
         IsListString field ->
             IsListString (updateField field.value field)
 
+        IsDate field ->
+            IsDate (updateField field.value field)
+
 
 {-| Private: Check if a field is valid
 -}
@@ -257,6 +282,9 @@ isFieldValid field =
             isResultOk field.validationResult
 
         IsListString field ->
+            isResultOk field.validationResult
+
+        IsDate field ->
             isResultOk field.validationResult
 
 
