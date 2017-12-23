@@ -192,16 +192,16 @@ updateOnFieldMsg : FieldMsg -> Maybe Field -> Maybe Field
 updateOnFieldMsg fieldMsg field =
     case ( field, fieldMsg ) of
         ( Just (IsString field), AsString _ value ) ->
-            Just (IsString (updateField value field))
+            Just <| IsString <| updateField field <| value
 
         ( Just (IsBool field), AsBool _ ) ->
-            Just (IsBool (updateField (not field.value) field))
+            Just <| IsBool <| updateField field <| not field.value
 
         ( Just (IsListString field), AsListString _ value ) ->
-            Just (IsListString (updateField (addOrRemoveListStringItem field.value value) field))
+            Just <| IsListString <| updateField field <| addOrRemoveListStringItem field.value value
 
         ( Just (IsDate field), AsDate _ value ) ->
-            Just (IsDate (updateField (dateFromStringWithDefault value) field))
+            Just <| IsDate <| updateField field <| dateFromStringWithDefault value
 
         _ ->
             Nothing
@@ -209,8 +209,8 @@ updateOnFieldMsg fieldMsg field =
 
 {-| Private: Update a field
 -}
-updateField : a -> FieldOf a -> FieldOf a
-updateField value field =
+updateField : FieldOf a -> a -> FieldOf a
+updateField field value =
     { field
         | value = value
         , validationResult = validateValue field.validators value
@@ -258,16 +258,16 @@ validateField : Field -> Field
 validateField field =
     case field of
         IsString field ->
-            IsString (updateField field.value field)
+            IsString (updateField field field.value)
 
         IsBool field ->
-            IsBool (updateField field.value field)
+            IsBool (updateField field field.value)
 
         IsListString field ->
-            IsListString (updateField field.value field)
+            IsListString (updateField field field.value)
 
         IsDate field ->
-            IsDate (updateField field.value field)
+            IsDate (updateField field field.value)
 
 
 {-| Private: Check if a field is valid
