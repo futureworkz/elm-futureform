@@ -15,6 +15,6 @@ dateFromStringWithDefault value =
 addOrRemoveListStringItem : List String -> String -> List String
 addOrRemoveListStringItem list item =
     if List.member item list then
-        List.filter (\str -> str /= item) list
+        List.filter ((/=) item) list
     else
         List.append list [ item ]

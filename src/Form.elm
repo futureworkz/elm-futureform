@@ -249,7 +249,7 @@ isFormValid form =
 -}
 validate : Form -> Form
 validate form =
-    { form | fields = Dict.map (\key -> validateField) form.fields }
+    { form | fields = Dict.map (always validateField) form.fields }
 
 
 {-| Private: Validate a field
@@ -309,4 +309,6 @@ getRawString fields name =
             field.value
 
         _ ->
-            Debug.log "FutureForm - getRawString" (name ++ " is not found") |> always ("")
+            ("Field " ++ name ++ " is not found.")
+                |> Debug.log "FutureForm - getRawString"
+                |> always ""
