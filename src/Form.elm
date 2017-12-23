@@ -42,7 +42,7 @@ module Form
 import Dict exposing (Dict)
 import Date
 import Form.Validators exposing (Validator)
-import Form.Functions exposing (dateFromStringWithDefault)
+import Form.Functions exposing (..)
 
 
 -- Types
@@ -53,7 +53,7 @@ import Form.Functions exposing (dateFromStringWithDefault)
 type FieldMsg
     = AsString String String
     | AsBool String
-    | AsListString String (List String)
+    | AsListString String String
     | AsDate String String
 
 
@@ -198,7 +198,7 @@ updateOnFieldMsg fieldMsg field =
             Just (IsBool (updateField (not field.value) field))
 
         ( Just (IsListString field), AsListString _ value ) ->
-            Just (IsListString (updateField value field))
+            Just (IsListString (updateField (addOrRemoveListStringItem field.value value) field))
 
         ( Just (IsDate field), AsDate _ value ) ->
             Just (IsDate (updateField (dateFromStringWithDefault value) field))

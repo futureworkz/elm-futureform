@@ -95,17 +95,32 @@ suite =
                             |> .fields
                             |> Dict.get key
                             |> equal (Just (IsBool (FieldOf True (Ok True) [])))
-            , fuzz (list string) "update a List String field from FieldMsg AsBool" <|
-                \newValues ->
+            , fuzz string "add an item to a List String field from FieldMsg AsListString" <|
+                \string ->
                     let
                         key =
                             "hobbies"
+                        newValues =
+                            [string]
                     in
                         createForm [ fieldListString key [] [] ]
-                            |> (flip updateForm) (AsListString key newValues)
+                            |> (flip updateForm) (AsListString key string)
                             |> .fields
                             |> Dict.get key
                             |> equal (Just (IsListString (FieldOf newValues (Ok newValues) [])))
+            , fuzz string "remove an item from a List String field from FieldMsg AsListString" <|
+                \string ->
+                    let
+                        key =
+                            "hobbies"
+                        newValues =
+                            [string]
+                    in
+                        createForm [ fieldListString key newValues [] ]
+                            |> (flip updateForm) (AsListString key string)
+                            |> .fields
+                            |> Dict.get key
+                            |> equal (Just (IsListString (FieldOf [] (Ok []) [])))
             , test "update a date field from FieldMsg AsDate" <|
                 \newValue ->
                     let
