@@ -56,7 +56,6 @@ type FieldMsg
     = AsString String String
     | AsBool String
     | AsListString String String
-    | AsDate String String
 
 
 {-| Form type
@@ -184,9 +183,6 @@ updateForm form fieldMsg =
             AsListString name _ ->
                 { form | fields = Dict.update name update form.fields }
 
-            AsDate name _ ->
-                { form | fields = Dict.update name update form.fields }
-
 
 {-| Private: Update a field based on a FieldMsg
 -}
@@ -202,7 +198,7 @@ updateOnFieldMsg fieldMsg field =
         ( Just (IsListString field), AsListString _ value ) ->
             Just <| IsListString <| updateField field <| addOrRemoveListStringItem field.value value
 
-        ( Just (IsDate field), AsDate _ value ) ->
+        ( Just (IsDate field), AsString _ value ) ->
             Just <| IsDate <| updateField field <| dateFromStringWithDefault value
 
         _ ->

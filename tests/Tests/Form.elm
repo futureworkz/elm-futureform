@@ -139,7 +139,7 @@ suite =
                             dateFromStringWithDefault newDateInput
                     in
                         createForm [ fieldDate key dateInput [] ]
-                            |> (flip updateForm) (AsDate key newDateInput)
+                            |> (flip updateForm) (AsString key newDateInput)
                             |> .fields
                             |> Dict.get key
                             |> equal (Just (IsDate (FieldOf newDateValue (Ok newDateValue) [])))
