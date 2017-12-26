@@ -14,6 +14,7 @@ module Form
         , isFormValid
         , getRawString
         , getRawListString
+        , getRawDate
         )
 
 {-| Simple, clean and extendable form manager for Elm
@@ -323,6 +324,18 @@ getRawListString fields name =
 
         _ ->
             missingFieldWarning name "getRawListString" []
+
+
+{-| Get value of a date field
+-}
+getRawDate : Dict String Field -> String -> Date.Date
+getRawDate fields name =
+    case Dict.get name fields of
+        Just (IsDate field) ->
+            field.value
+
+        _ ->
+            missingFieldWarning name "getRawDate" (Date.fromTime 0)
 
 
 {-| Write log to console about missing field

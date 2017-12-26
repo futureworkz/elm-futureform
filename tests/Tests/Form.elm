@@ -218,4 +218,45 @@ suite =
                                 |> equal []
                 ]
             ]
+        , describe "getRawDate"
+            [ describe "Valid field name"
+                [ test "Returns value of date field" <|
+                    \_ ->
+                        let
+                            fieldName =
+                                "birthday"
+
+                            value =
+                                "08-25-1987"
+
+                            dateValue =
+                                dateFromStringWithDefault value
+                        in
+                            createForm [ fieldDate fieldName value [] ]
+                                |> .fields
+                                |> (flip getRawDate) fieldName
+                                |> equal dateValue
+                ]
+            , describe "Invalid field name"
+                [ test "Returns default date of date field" <|
+                    \_ ->
+                        let
+                            fieldName =
+                                "birthday"
+
+                            missingFieldName =
+                                "missingBirthday"
+
+                            value =
+                                "08-25-1987"
+
+                            dateValue =
+                                Date.fromTime 0
+                        in
+                            createForm [ fieldDate fieldName value [] ]
+                                |> .fields
+                                |> (flip getRawDate) missingFieldName
+                                |> equal dateValue
+                ]
+            ]
         ]
