@@ -13,6 +13,7 @@ module Form
         , updateForm
         , isFormValid
         , getRawString
+        , getRawListString
         )
 
 {-| Simple, clean and extendable form manager for Elm
@@ -309,6 +310,25 @@ getRawString fields name =
             field.value
 
         _ ->
-            ("Field " ++ name ++ " is not found.")
-                |> Debug.log "FutureForm - getRawString"
-                |> always ""
+            missingFieldWarning name "getRawString" ""
+
+
+{-| Get value of a list string field
+-}
+getRawListString : Dict String Field -> String -> List String
+getRawListString fields name =
+    case Dict.get name fields of
+        Just (IsListString field) ->
+            field.value
+
+        _ ->
+            missingFieldWarning name "getRawListString" []
+
+
+{-| Write log to console about missing field
+-}
+missingFieldWarning : String -> String -> a -> a
+missingFieldWarning fieldName functionName defaultValue =
+    ("Field " ++ fieldName ++ " is not found.")
+        |> Debug.log ("FutureForm - " ++ functionName)
+        |> always defaultValue

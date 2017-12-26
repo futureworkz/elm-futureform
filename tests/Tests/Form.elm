@@ -100,8 +100,9 @@ suite =
                     let
                         key =
                             "hobbies"
+
                         newValues =
-                            [string]
+                            [ string ]
                     in
                         createForm [ fieldListString key [] [] ]
                             |> (flip updateForm) (AsListString key string)
@@ -113,8 +114,9 @@ suite =
                     let
                         key =
                             "hobbies"
+
                         newValues =
-                            [string]
+                            [ string ]
                     in
                         createForm [ fieldListString key newValues [] ]
                             |> (flip updateForm) (AsListString key string)
@@ -185,6 +187,35 @@ suite =
                                 |> .fields
                                 |> (flip getRawString) invalidFieldName
                                 |> equal ""
+                ]
+            ]
+        , describe "getRawListString"
+            [ describe "Valid field name"
+                [ fuzz (list string) "Returns value of string field" <|
+                    \value ->
+                        let
+                            fieldName =
+                                "title"
+                        in
+                            createForm [ fieldListString fieldName value [] ]
+                                |> .fields
+                                |> (flip getRawListString) fieldName
+                                |> equal value
+                ]
+            , describe "Invalid field name"
+                [ fuzz (list string) "Returns empty list of list string field" <|
+                    \value ->
+                        let
+                            fieldName =
+                                "title"
+
+                            invalidFieldName =
+                                "missingTitle"
+                        in
+                            createForm [ fieldListString fieldName value [] ]
+                                |> .fields
+                                |> (flip getRawListString) invalidFieldName
+                                |> equal []
                 ]
             ]
         ]
