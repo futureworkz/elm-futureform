@@ -4,6 +4,8 @@ import Test exposing (..)
 import Expect exposing (..)
 import Fuzz exposing (..)
 import Form.Validators exposing (..)
+import Form.Functions exposing (..)
+import Date
 
 
 suite : Test
@@ -77,6 +79,42 @@ suite =
                         in
                             validateUsername username
                                 |> equal (Err "Field can only contains letters and numbers.")
+                ]
+            ]
+        , describe "isLegalAge"
+            [ describe "Legal age"
+                [ test "return result OK" <|
+                    \_ ->
+                        let
+                            -- TODO: To refactor this to async validation
+                            currentDate =
+                                2017
+
+                            dateString =
+                                toString (currentDate - 18)
+
+                            date =
+                                dateFromStringWithDefault dateString
+                        in
+                            isLegalAge date
+                                |> equal (Ok date)
+                ]
+            , describe "Illegal age"
+                [ test "return result Err for illegal age" <|
+                    \_ ->
+                        let
+                            -- TODO: To refactor this to async validation
+                            currentDate =
+                                2017
+
+                            dateString =
+                                toString (currentDate - 17)
+
+                            date =
+                                dateFromStringWithDefault dateString
+                        in
+                            isLegalAge date
+                                |> equal (Err ("You must be above 17 years old."))
                 ]
             ]
         ]

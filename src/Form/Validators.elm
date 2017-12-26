@@ -15,6 +15,7 @@ module Form.Validators exposing (..)
 -}
 
 import Regex
+import Date
 
 
 {-| All validator must be of type Validator
@@ -80,3 +81,26 @@ validateUsername : Validator String
 validateUsername username =
     validateMinChars 3 username
         |> Result.andThen validateIsAlphaNumeric
+
+
+{-| Check if date string is a legal age
+-}
+isLegalAge : Validator Date.Date
+isLegalAge date =
+    let
+        -- TODO: To refactor this to async validation
+        currentYear =
+            2017
+
+        year =
+            Date.year date
+
+        isLegalAge =
+            (currentYear - year) > 17
+    in
+        case isLegalAge of
+            True ->
+                Ok date
+
+            False ->
+                Err ("You must be above 17 years old.")
