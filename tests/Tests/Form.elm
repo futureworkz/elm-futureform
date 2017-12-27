@@ -169,7 +169,6 @@ suite =
                                 "name"
                         in
                             createForm [ fieldString fieldName value [] ]
-                                |> .fields
                                 |> (flip getRawString) fieldName
                                 |> equal value
                 ]
@@ -184,7 +183,6 @@ suite =
                                 "missingName"
                         in
                             createForm [ fieldString fieldName value [] ]
-                                |> .fields
                                 |> (flip getRawString) invalidFieldName
                                 |> equal ""
                 ]
@@ -198,7 +196,6 @@ suite =
                                 "title"
                         in
                             createForm [ fieldListString fieldName value [] ]
-                                |> .fields
                                 |> (flip getRawListString) fieldName
                                 |> equal value
                 ]
@@ -213,7 +210,6 @@ suite =
                                 "missingTitle"
                         in
                             createForm [ fieldListString fieldName value [] ]
-                                |> .fields
                                 |> (flip getRawListString) invalidFieldName
                                 |> equal []
                 ]
@@ -233,7 +229,6 @@ suite =
                                 dateFromStringWithDefault value
                         in
                             createForm [ fieldDate fieldName value [] ]
-                                |> .fields
                                 |> (flip getRawDate) fieldName
                                 |> equal dateValue
                 ]
@@ -254,7 +249,6 @@ suite =
                                 Date.fromTime 0
                         in
                             createForm [ fieldDate fieldName value [] ]
-                                |> .fields
                                 |> (flip getRawDate) missingFieldName
                                 |> equal dateValue
                 ]
