@@ -300,9 +300,9 @@ isResultOk result =
 
 {-| Get value of a string field
 -}
-getRawString : Dict String Field -> String -> String
-getRawString fields name =
-    case Dict.get name fields of
+getRawString : Form -> String -> String
+getRawString form name =
+    case Dict.get name form.fields of
         Just (IsString field) ->
             field.value
 
@@ -312,9 +312,9 @@ getRawString fields name =
 
 {-| Get value of a list string field
 -}
-getRawListString : Dict String Field -> String -> List String
-getRawListString fields name =
-    case Dict.get name fields of
+getRawListString : Form -> String -> List String
+getRawListString form name =
+    case Dict.get name form.fields of
         Just (IsListString field) ->
             field.value
 
@@ -324,9 +324,9 @@ getRawListString fields name =
 
 {-| Get value of a date field
 -}
-getRawDate : Dict String Field -> String -> Date.Date
-getRawDate fields name =
-    case Dict.get name fields of
+getRawDate : Form -> String -> Date.Date
+getRawDate form name =
+    case Dict.get name form.fields of
         Just (IsDate field) ->
             field.value
 
