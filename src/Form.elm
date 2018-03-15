@@ -12,6 +12,7 @@ module Form
         , fieldDate
         , updateForm
         , isFormValid
+        , getRawBool
         , getRawString
         , getRawListString
         , getRawDate
@@ -320,6 +321,19 @@ getRawListString form name =
 
         _ ->
             missingFieldWarning name "getRawListString" []
+
+
+{-| Get value of a bool field
+-}
+getRawBool : Form -> String -> Bool
+getRawBool form name =
+    case Dict.get name form.fields of
+        Just (IsBool field) ->
+            field.value
+
+        _ ->
+            missingFieldWarning name "getRawBool" ""
+                |> always False
 
 
 {-| Get value of a date field
