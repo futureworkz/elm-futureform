@@ -83,6 +83,16 @@ validateUsername username =
         |> Result.andThen validateIsAlphaNumeric
 
 
+{-| Checks that a List String is not empty
+-}
+isNotEmptyList : Validator (List String)
+isNotEmptyList list =
+    if List.length list > 0 then
+        Ok list
+    else
+        Err "This field cannot be empty"
+
+
 {-| Check if date string is a legal age
 -}
 isLegalAge : Validator Date.Date
