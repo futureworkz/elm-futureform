@@ -127,4 +127,4 @@ isLegalAge date =
                 Ok date
 
             False ->
-                Err ("You must be above 17 years old.")
+                Err ("You must be at least 18 years old.")
