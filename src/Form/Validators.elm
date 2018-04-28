@@ -75,6 +75,20 @@ validateIsAlphaNumeric value =
             Err ("Field can only contains letters and numbers.")
 
 
+{-| Check if string is only contain Alphabet and Numeric
+-}
+validateIsNumeric : Validator String
+validateIsNumeric value =
+    let
+        regex =
+            \char -> Regex.contains (Regex.regex "[0-9]") (toString char)
+    in
+        if String.all regex value then
+            Ok value
+        else
+            Err ("Field can only contains numbers.")
+
+
 {-| Checks that a string only contain Alphabet and Numeric and string length larger than 2
 -}
 validateUsername : Validator String
