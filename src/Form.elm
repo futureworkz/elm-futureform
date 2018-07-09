@@ -11,6 +11,7 @@ module Form
         , fieldListString
         , fieldDate
         , updateForm
+        , validate
         , isFormValid
         , getRawBool
         , getRawString
@@ -244,7 +245,7 @@ isFormValid form =
         |> List.all isFieldValid
 
 
-{-| Private: Force the form to run all validations
+{-| Force the form to run all validations
 -}
 validate : Form -> Form
 validate form =
