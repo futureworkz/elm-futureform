@@ -17,6 +17,7 @@ module Form
         , getRawString
         , getRawListString
         , getRawDate
+        , addFieldError
         )
 
 {-| Simple, clean and extendable form manager for Elm
@@ -204,6 +205,27 @@ updateOnFieldMsg fieldMsg field =
             Just <| IsDate <| updateField field <| dateFromStringWithDefault value
 
         _ ->
+            Nothing
+
+
+{-| Add field error
+-}
+addFieldError : String -> Maybe Field -> Maybe Field
+addFieldError errorMsg field =
+    case field of
+        Just (IsString field) ->
+            Just (IsString { field | validationResult = (Err errorMsg) })
+
+        Just (IsBool field) ->
+            Just (IsBool { field | validationResult = (Err errorMsg) })
+
+        Just (IsListString field) ->
+            Just (IsListString { field | validationResult = (Err errorMsg) })
+
+        Just (IsDate field) ->
+            Just (IsDate { field | validationResult = (Err errorMsg) })
+
+        Nothing ->
             Nothing
 
 
